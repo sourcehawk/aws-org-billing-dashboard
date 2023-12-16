@@ -1,0 +1,93 @@
+nameOverride: ""
+fullnameOverride: ""
+
+defaultLabels:
+  {}
+  # app: ""
+
+# Configure datasource using AWS Secrets Manager with external-secrets
+# https://external-secrets.io/latest/provider/aws-secrets-manager/
+externalSecrets:
+  # Enable if you have external secrets provider for AWS Secrets Manager on your cluster
+  enabled: false
+
+  # Define the secret store
+  secretStore:
+    # Type of secret store (ClusterSecretStore / SecretStore)
+    kind: ClusterSecretStore
+    # Name of the secret store
+    name: ""
+    # Namespace of the secret store (Ignored if kind is ClusterSecretStore)
+    namespace: ""
+
+  # Define the secret in the secret store
+  secret:
+    # Name of the secret in the secret store
+    name: "grafana-athena-datasource"
+    # The key in the secret store that contains the secret
+    keys:
+      catalog: "catalog"
+      database: "database"
+      workgroup: "workgroup"
+      accessKey: "access_key_id"
+      secretKey: "secret_access_key"
+      defaultRegion: "default_region"
+
+# Configure datasource
+# https://grafana.com/grafana/plugins/grafana-athena-datasource/?tab=overview
+datasource:
+  # Name of the datasource, shown in the grafana UI
+  name: "Amazon Athena"
+  # The UID for the datasource, must be unique across all datasources
+  uid: "amazon_athena"
+
+  # Set the label required for grafana sidecar for datasources to detect the dashboard
+  # https://artifacthub.io/packages/helm/grafana/grafana?modal=values&path=sidecar.datasources.label
+  labels:
+    {}
+    # grafana_datasource: "1"
+
+  # Set the datasource values (Ignored if externalSecrets.enabled is true)
+  config:
+    defaultRegion: ""
+    workgroup: ""
+    catalog: ""
+    database: ""
+    endpoint: "" # Optional
+    externalId: "" # Optional
+    outputLocation: "" # Optional
+
+  # Set the authentication method (Ignored if externalSecrets.enabled is true)
+  auth:
+    # Type of authentication method (keys / default / credentials)
+    type: keys
+    # When using 'keys' authentication method set secret access key and access key id
+    keys:
+      accessKey: ""
+      secretKey: ""
+    # When using 'default' authentication method (sdk) set the assume role arn
+    default:
+      assumeRoleArn: ""
+    # When using 'credentials' authentication method set the profile name
+    credentials:
+      profile: ""
+
+# Configures dashboard deployment for grafana
+dashboard:
+  # Set the label required for grafana sidecar for dashboards to detect the dashboard
+  # https://artifacthub.io/packages/helm/grafana/grafana?modal=values&path=sidecar.dashboards.label
+  labels:
+    {}
+    # grafana_dashboard: "1"
+
+  # Set any additional annotations, such as one that sets the dashboard folder
+  # https://artifacthub.io/packages/helm/grafana/grafana?modal=values&path=sidecar.dashboards.folderAnnotation
+  annotations:
+    {}
+    # dashboard-folder: "/tmp/dashboards/aws"
+
+# TODO: allow from secret/configmap, only for source testing now
+test:
+  grafana_url: "http://grafana"
+  grafana_user: "admin"
+  grafana_password: "admin"

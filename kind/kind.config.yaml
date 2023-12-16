@@ -1,0 +1,35 @@
+# See https://kind.sigs.k8s.io/docs/user/configuration/ for configuration
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+    image: kindest/node:v1.28.0
+    kubeadmConfigPatches:
+      - |
+        kind: InitConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "ingress-ready=true"
+    extraPortMappings:
+      # Expose web entrypoint on host at port 8000
+      - containerPort: 32080
+        hostPort: 8000
+        protocol: TCP
+      # Expose websecure entrypoint on host at port 8001
+      - containerPort: 32443
+        hostPort: 8001
+        protocol: TCP
+      # Expose grafana entrypoint on host at port 4444
+      - containerPort: 32100
+        hostPort: 4000
+        protocol: TCP
+      # Expose Traefik Frontend (http://localhost:9000/dashboard/#/)
+      - containerPort: 32090
+        hostPort: 9000
+        protocol: TCP
+  - role: worker
+    image: kindest/node:v1.28.0
+  - role: worker
+    image: kindest/node:v1.28.0
+  - role: worker
+    image: kindest/node:v1.28.0

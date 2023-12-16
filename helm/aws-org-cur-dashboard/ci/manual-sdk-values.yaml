@@ -1,0 +1,29 @@
+nameOverride: ""
+fullnameOverride: "aws-cur"
+
+defaultLabels:
+  test: "test-manual-sdk"
+
+datasource:
+  name: "Amazon Athena Test"
+  uid: "amazon_athena"
+  labels:
+    grafana_datasource: "1"
+  config:
+    defaultRegion: "eu-west-3"
+    workgroup: "test-workgroup-manual-sdk"
+    catalog: "test-catalog-manual-sdk"
+    database: "test-database-manual-sdk"
+    endpoint: "test-endpoint-manual-sdk"
+    externalId: "test-external-id-manual-sdk"
+    outputLocation: "test-output-location-manual-sdk"
+  auth:
+    type: default
+    default:
+      assumeRoleArn: "test-assume-role-arn-manual-sdk"
+
+dashboard:
+  labels:
+    grafana_dashboard: "1"
+  annotations:
+    dashboard-target-directory: "/tmp/dashboards/aws"

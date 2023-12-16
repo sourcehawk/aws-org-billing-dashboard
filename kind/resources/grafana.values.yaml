@@ -1,0 +1,40 @@
+ingress:
+  enabled: true
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: grafana
+  hosts:
+    - "localhost"
+
+dashboardProviders:
+  dashboardproviders.yaml:
+    apiVersion: 1
+    providers:
+      - name: "AWS"
+        orgId: 1
+        folder: "aws"
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /tmp/dashboards/aws
+
+sidecar:
+  dashboards:
+    enabled: true
+    label: grafana_dashboard
+    labelValue: "1"
+    defaultFolderName: "default"
+    folderAnnotation: "dashboard-target-directory"
+    provider:
+      folder: "/tmp/dashboards"
+      foldersFromFilesStructure: true
+  datasources:
+    enabled: true
+    label: grafana_datasource
+    labelValue: "1"
+
+plugins:
+  - grafana-athena-datasource
+
+adminUser: admin
+adminPassword: admin

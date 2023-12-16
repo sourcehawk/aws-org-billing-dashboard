@@ -1,0 +1,1135 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Custom aws cost and usage report dashboard carefully crafted for aws organizations with multiple accounts.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 53,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "grafana-athena-datasource",
+        "uid": "${datasource}"
+      },
+      "description": "Total accumulated cost of current month compared to the previous month at the same amount of days. Note that if the current month has more days than the previous, the previous total is scaled to match the days.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "unit": "currencyUSD"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Current bill"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "days"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Scaling factor"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "x"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Last bill"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "days"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Change"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "percentage",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "#EAB839",
+                      "value": 5
+                    },
+                    {
+                      "color": "red",
+                      "value": 10
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 5,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "vertical",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/.*/",
+          "values": false
+        },
+        "text": {},
+        "textMode": "value_and_name"
+      },
+      "pluginVersion": "9.5.5",
+      "targets": [
+        {
+          "connectionArgs": {
+            "catalog": "__default",
+            "database": "__default",
+            "region": "__default",
+            "resultReuseEnabled": false,
+            "resultReuseMaxAgeInMinutes": 60
+          },
+          "datasource": {
+            "type": "grafana-athena-datasource",
+            "uid": "${datasource}"
+          },
+          "format": 1,
+          "hide": false,
+          "rawSQL": "-- Author: Ægir Máni Hauksson (@hauks96)\nWITH bill_start_dates AS (\n  SELECT DISTINCT bill_billing_period_start_date, bill_billing_period_end_date\n  FROM $__table\n),\n-- Create a table that ranks the billing period start date column from highest to lowest\nbill_date_rankings AS (\n  SELECT\n    bill_billing_period_start_date,\n    bill_billing_period_end_date,\n    RANK() OVER (ORDER BY bill_billing_period_start_date DESC) AS date_rank\n  FROM bill_start_dates\n),\n-- Get the start of the current billing period and the previous billing period using the rankings\nbill_dates AS (\n  SELECT\n    MAX(CASE WHEN date_rank = 1 THEN bill_billing_period_start_date END) AS current_bill_start_date,\n    MAX(CASE WHEN date_rank = 1 THEN bill_billing_period_end_date END) AS current_bill_end_date,\n    MAX(CASE WHEN date_rank = 2 THEN bill_billing_period_start_date END) AS previous_bill_start_date,\n    MAX(CASE WHEN date_rank = 2 THEN bill_billing_period_end_date END) AS previous_bill_end_date\n  FROM bill_date_rankings\n),\n-- Extract some key data about the timestamp of the current billing period\ncurrent_bill_period AS (\n  SELECT \n    MAX(line_item_usage_start_date) AS max_date,\n    DAY(MAX(line_item_usage_start_date)) AS days_completed,\n    CAST(MAX(line_item_usage_start_date) AS TIME) AS time_completed\n  FROM \n    $__table\n  WHERE \n    bill_billing_period_start_date = (SELECT current_bill_start_date FROM bill_dates) AND\n    line_item_usage_start_date >= (SELECT current_bill_start_date FROM bill_dates) AND\n    line_item_usage_start_date < (SELECT current_bill_end_date FROM bill_dates)\n),\n-- Extract some key data about the timestamp of the previous billing period\nprevious_bill_period AS (\n  SELECT \n    MAX(line_item_usage_start_date) AS max_date,\n    DAY(MAX(line_item_usage_start_date)) AS days_completed,\n    MONTH(MAX(line_item_usage_start_date)) AS max_month,\n    YEAR(MAX(line_item_usage_start_date)) AS max_year,\n    DAY(last_day_of_month(MAX(line_item_usage_start_date))) AS final_day_of_month\n  FROM \n    $__table \n  WHERE \n    bill_billing_period_start_date = (SELECT previous_bill_start_date FROM bill_dates) AND\n    line_item_usage_start_date >= (SELECT previous_bill_start_date FROM bill_dates) AND\n    line_item_usage_start_date < (SELECT previous_bill_end_date FROM bill_dates)\n),\n-- Generate a timestamp to cut off the previous billing period cost (use the day and time from current billing period to create a timestamp in the previous period)\ngenerated_date AS (\n  SELECT \n    CASE\n      WHEN (SELECT days_completed FROM current_bill_period) > (SELECT final_day_of_month FROM previous_bill_period)\n      -- If the current bill has completed more days than exist in the previous month, we use the max day of the previous month\n      THEN from_iso8601_timestamp(\n         CAST((SELECT max_year FROM previous_bill_period) AS VARCHAR) || '-' || \n         CAST((SELECT max_month FROM previous_bill_period) AS VARCHAR) || '-' || \n         CAST((SELECT final_day_of_month FROM previous_bill_period) AS VARCHAR) || 'T' || \n         CAST((SELECT time_completed FROM current_bill_period) AS VARCHAR)\n      )\n      -- The previous month has the amount of days the current bill period has completed so we use the days_completed\n      ELSE from_iso8601_timestamp(\n        CAST((SELECT max_year FROM previous_bill_period) AS VARCHAR) || '-' || \n        CAST((SELECT max_month FROM previous_bill_period) AS VARCHAR) || '-' || \n        CAST((SELECT days_completed FROM current_bill_period) AS VARCHAR) || 'T' || \n        CAST((SELECT time_completed FROM current_bill_period) AS VARCHAR)\n      )\n    END AS previous_bill_timestamp\n),\n-- To scale the date in case the previous month has less days than the current month (total cost so far * scaling factor)\nscaling_factor AS (\n  SELECT\n    CASE\n      WHEN (SELECT days_completed FROM current_bill_period) > (SELECT days_completed FROM previous_bill_period)\n      THEN (SELECT days_completed FROM current_bill_period) / (SELECT days_completed FROM previous_bill_period)\n      ELSE 1.0\n    END AS scale\n)\nSELECT\n  ROUND(SUM(line_item_unblended_cost * (SELECT scale FROM scaling_factor)), 2) AS \"Previous cost\", \n  EXTRACT(DAY FROM (SELECT max_date FROM current_bill_period)) AS \"Current bill\",\n  (SELECT days_completed FROM previous_bill_period) AS \"Last bill\",\n  (SELECT scale FROM scaling_factor) AS \"Scaling factor\"\nFROM\n  $__table\nWHERE\n  -- Get cost of previous billing period by limiting the row output to start of previous billing period and cut it off using the time and day of the current billing period\n  bill_billing_period_start_date = (SELECT previous_bill_start_date FROM bill_dates) AND \n  line_item_usage_start_date <= (SELECT previous_bill_timestamp FROM generated_date)\nORDER BY\n  \"Previous cost\" DESC;\n",
+          "refId": "Previous month at same day",
+          "table": "$table"
+        },
+        {
+          "connectionArgs": {
+            "catalog": "__default",
+            "database": "__default",
+            "region": "__default",
+            "resultReuseEnabled": false,
+            "resultReuseMaxAgeInMinutes": 60
+          },
+          "datasource": {
+            "type": "grafana-athena-datasource",
+            "uid": "${datasource}"
+          },
+          "format": 1,
+          "hide": false,
+          "rawSQL": "-- Author: Ægir Máni Hauksson (@hauks96)\nWITH max_date AS (\n  SELECT MAX(bill_billing_period_start_date) AS max_billing_date\n  FROM $__table\n)\nSELECT\n  ROUND(SUM(line_item_unblended_cost), 2) AS \"Current cost\"\nFROM\n  $__table\nWHERE\n  bill_billing_period_start_date = (SELECT max_billing_date FROM max_date)\nORDER BY\n  \"Current cost\" DESC;",
+          "refId": "Current",
+          "table": "$table"
+        }
+      ],
+      "title": "Total comparison",
+      "transformations": [
+        {
+          "id": "concatenate",
+          "options": {
+            "frameNameLabel": "frame",
+            "frameNameMode": "drop"
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "mode": "reduceRow",
+            "reduce": {
+              "include": [
+                "Current cost",
+                "Previous cost"
+              ],
+              "reducer": "diff"
+            },
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Difference": true,
+              "Last bill": true,
+              "Last month": true,
+              "Scaling factor": true
+            },
+            "indexByName": {
+              "Current cost": 1,
+              "Current month": 4,
+              "Difference": 5,
+              "Last month": 2,
+              "Previous cost": 0,
+              "Scaling factor": 3
+            },
+            "renameByName": {}
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Change",
+            "mode": "reduceRow",
+            "reduce": {
+              "include": [
+                "Current cost",
+                "Previous cost"
+              ],
+              "reducer": "diffperc"
+            }
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "grafana-athena-datasource",
+        "uid": "${datasource}"
+      },
+      "description": "Change in total accumulated cost of current month compared to the previous month at the same amount of days. Note that if the current month has more days than the previous, the previous total is scaled to match the days.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "mode": "basic",
+              "type": "color-background"
+            },
+            "filterable": true,
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "transparent",
+                "value": null
+              }
+            ]
+          },
+          "unit": "currencyUSD"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Current bill"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "days"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Scaling factor"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "x"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Last bill"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "days"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Change"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "transparent",
+                      "value": null
+                    },
+                    {
+                      "color": "semi-dark-green",
+                      "value": -1000
+                    },
+                    {
+                      "color": "green",
+                      "value": -0.05
+                    },
+                    {
+                      "color": "light-green",
+                      "value": -0.025
+                    },
+                    {
+                      "color": "super-light-green",
+                      "value": -0.0125
+                    },
+                    {
+                      "color": "transparent",
+                      "value": 0
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0.0125
+                    },
+                    {
+                      "color": "orange",
+                      "value": 0.025
+                    },
+                    {
+                      "color": "red",
+                      "value": 0.05
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 6,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Change"
+          }
+        ]
+      },
+      "pluginVersion": "9.5.5",
+      "targets": [
+        {
+          "connectionArgs": {
+            "catalog": "__default",
+            "database": "__default",
+            "region": "__default",
+            "resultReuseEnabled": false,
+            "resultReuseMaxAgeInMinutes": 60
+          },
+          "datasource": {
+            "type": "grafana-athena-datasource",
+            "uid": "${datasource}"
+          },
+          "format": 1,
+          "hide": false,
+          "rawSQL": "-- Author: Ægir Máni Hauksson (@hauks96)\nWITH bill_start_dates AS (\n  SELECT DISTINCT bill_billing_period_start_date, bill_billing_period_end_date\n  FROM $__table\n),\n-- Create a table that ranks the billing period start date column from highest to lowest\nbill_date_rankings AS (\n  SELECT\n    bill_billing_period_start_date,\n    bill_billing_period_end_date,\n    RANK() OVER (ORDER BY bill_billing_period_start_date DESC) AS date_rank\n  FROM bill_start_dates\n),\n-- Get the start of the current billing period and the previous billing period using the rankings\nbill_dates AS (\n  SELECT\n    MAX(CASE WHEN date_rank = 1 THEN bill_billing_period_start_date END) AS current_bill_start_date,\n    MAX(CASE WHEN date_rank = 1 THEN bill_billing_period_end_date END) AS current_bill_end_date,\n    MAX(CASE WHEN date_rank = 2 THEN bill_billing_period_start_date END) AS previous_bill_start_date,\n    MAX(CASE WHEN date_rank = 2 THEN bill_billing_period_end_date END) AS previous_bill_end_date\n  FROM bill_date_rankings\n),\n-- Extract some key data about the timestamp of the current billing period\ncurrent_bill_period AS (\n  SELECT \n    MAX(line_item_usage_start_date) AS max_date,\n    DAY(MAX(line_item_usage_start_date)) AS days_completed,\n    CAST(MAX(line_item_usage_start_date) AS TIME) AS time_completed\n  FROM \n    $__table\n  WHERE \n    bill_billing_period_start_date = (SELECT current_bill_start_date FROM bill_dates) AND\n    line_item_usage_start_date >= (SELECT current_bill_start_date FROM bill_dates) AND\n    line_item_usage_start_date < (SELECT current_bill_end_date FROM bill_dates)\n),\n-- Extract some key data about the timestamp of the previous billing period\nprevious_bill_period AS (\n  SELECT \n    MAX(line_item_usage_start_date) AS max_date,\n    DAY(MAX(line_item_usage_start_date)) AS days_completed,\n    MONTH(MAX(line_item_usage_start_date)) AS max_month,\n    YEAR(MAX(line_item_usage_start_date)) AS max_year,\n    DAY(last_day_of_month(MAX(line_item_usage_start_date))) AS final_day_of_month\n  FROM \n    $__table \n  WHERE \n    bill_billing_period_start_date = (SELECT previous_bill_start_date FROM bill_dates) AND\n    line_item_usage_start_date >= (SELECT previous_bill_start_date FROM bill_dates) AND\n    line_item_usage_start_date < (SELECT previous_bill_end_date FROM bill_dates)\n),\n-- Generate a timestamp to cut off the previous billing period cost (use the day and time from current billing period to create a timestamp in the previous period)\ngenerated_date AS (\n  SELECT \n    CASE\n      WHEN (SELECT days_completed FROM current_bill_period) > (SELECT final_day_of_month FROM previous_bill_period)\n      -- If the current bill has completed more days than exist in the previous month, we use the max day of the previous month\n      THEN from_iso8601_timestamp(\n         CAST((SELECT max_year FROM previous_bill_period) AS VARCHAR) || '-' || \n         CAST((SELECT max_month FROM previous_bill_period) AS VARCHAR) || '-' || \n         CAST((SELECT final_day_of_month FROM previous_bill_period) AS VARCHAR) || 'T' || \n         CAST((SELECT time_completed FROM current_bill_period) AS VARCHAR)\n      )\n      -- The previous month has the amount of days the current bill period has completed so we use the days_completed\n      ELSE from_iso8601_timestamp(\n        CAST((SELECT max_year FROM previous_bill_period) AS VARCHAR) || '-' || \n        CAST((SELECT max_month FROM previous_bill_period) AS VARCHAR) || '-' || \n        CAST((SELECT days_completed FROM current_bill_period) AS VARCHAR) || 'T' || \n        CAST((SELECT time_completed FROM current_bill_period) AS VARCHAR)\n      )\n    END AS previous_bill_timestamp\n),\n-- To scale the date in case the previous month has less days than the current month (total cost so far * scaling factor)\nscaling_factor AS (\n  SELECT\n    CASE\n      WHEN (SELECT days_completed FROM current_bill_period) > (SELECT days_completed FROM previous_bill_period)\n      THEN (SELECT days_completed FROM current_bill_period) / (SELECT days_completed FROM previous_bill_period)\n      ELSE 1.0\n    END AS scale\n)\nSELECT\n  (\n    SELECT account_name\n    FROM $account_names_table m\n    WHERE line_item_usage_account_id = m.account_id\n  ) AS \"Account Name\",\n  ROUND(SUM(line_item_unblended_cost * (SELECT scale FROM scaling_factor)), 2) AS \"Previous cost\", \n  EXTRACT(DAY FROM (SELECT max_date FROM current_bill_period)) AS \"Current bill\",\n  (SELECT days_completed FROM previous_bill_period) AS \"Last bill\",\n  (SELECT scale FROM scaling_factor) AS \"Scaling factor\"\nFROM\n  $__table\nWHERE\n  -- Get cost of previous billing period by limiting the row output to start of previous billing period and cut it off using the time and day of the current billing period\n  bill_billing_period_start_date = (SELECT previous_bill_start_date FROM bill_dates) AND \n  line_item_usage_start_date <= (SELECT previous_bill_timestamp FROM generated_date)\nGROUP BY \n  line_item_usage_account_id\nORDER BY\n  \"Previous cost\" DESC;\n",
+          "refId": "Previous",
+          "table": "$table"
+        },
+        {
+          "connectionArgs": {
+            "catalog": "__default",
+            "database": "__default",
+            "region": "__default",
+            "resultReuseEnabled": false,
+            "resultReuseMaxAgeInMinutes": 60
+          },
+          "datasource": {
+            "type": "grafana-athena-datasource",
+            "uid": "${datasource}"
+          },
+          "format": 1,
+          "hide": false,
+          "rawSQL": "-- Author: Ægir Máni Hauksson (@hauks96)\nWITH max_date AS (\n  SELECT MAX(bill_billing_period_start_date) AS max_billing_date\n  FROM $__table\n)\nSELECT\n  (\n    SELECT account_name\n    FROM $account_names_table m\n    WHERE line_item_usage_account_id = m.account_id\n  ) AS \"Account Name\",\n  ROUND(SUM(line_item_unblended_cost), 2) AS \"Current cost\"\nFROM\n  $__table\nWHERE\n  bill_billing_period_start_date = (SELECT max_billing_date FROM max_date)\nGROUP BY\n  line_item_usage_account_id\nORDER BY\n  \"Current cost\" DESC;",
+          "refId": "Current",
+          "table": "$table"
+        }
+      ],
+      "title": "Total change per account",
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "mode": "reduceRow",
+            "reduce": {
+              "include": [
+                "Current cost",
+                "Previous cost"
+              ],
+              "reducer": "diff"
+            },
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Current bill": true,
+              "Current cost": false,
+              "Current month": true,
+              "Difference": true,
+              "Last bill": true,
+              "Last month": true,
+              "Previous cost": false,
+              "Scaling factor": true
+            },
+            "indexByName": {
+              "Account Name": 0,
+              "Current cost": 2,
+              "Current month": 5,
+              "Difference": 6,
+              "Last month": 3,
+              "Previous cost": 1,
+              "Scaling factor": 4
+            },
+            "renameByName": {}
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Change",
+            "mode": "reduceRow",
+            "reduce": {
+              "include": [
+                "Current cost",
+                "Previous cost"
+              ],
+              "reducer": "diffperc"
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Account Name": false,
+              "Current cost": false,
+              "Previous cost": false
+            },
+            "indexByName": {},
+            "renameByName": {
+              "Current cost": ""
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "desc": true,
+                "field": "Change"
+              }
+            ]
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-athena-datasource",
+        "uid": "${datasource}"
+      },
+      "description": "Shows top costs by account and product in the most recent billing report. Cutoff is 5 USD.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "mode": "basic",
+              "type": "color-background"
+            },
+            "filterable": true,
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "transparent",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Cost (USD)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "currencyUSD"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 12,
+        "x": 0,
+        "y": 5
+      },
+      "id": 1,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "9.5.5",
+      "targets": [
+        {
+          "connectionArgs": {
+            "catalog": "__default",
+            "database": "__default",
+            "region": "__default",
+            "resultReuseEnabled": false,
+            "resultReuseMaxAgeInMinutes": 60
+          },
+          "datasource": {
+            "type": "grafana-athena-datasource",
+            "uid": "${datasource}"
+          },
+          "format": 1,
+          "key": "Q-0f31c89d-f66f-4195-a1f6-e1d2b0ebc04f-0",
+          "rawSQL": "-- Author: Ægir Máni Hauksson (@hauks96)\nWITH max_date AS (\n  SELECT MAX(bill_billing_period_start_date) AS max_billing_date\n  FROM $__table\n)\nSELECT\n  line_item_product_code AS \"Product\",\n  (\n    SELECT account_name\n    FROM $account_names_table m\n    WHERE line_item_usage_account_id = m.account_id\n  ) AS \"Account Name\",\n  ROUND(SUM(line_item_unblended_cost), 2) AS \"Cost (USD)\"\nFROM\n  $__table\nWHERE\n  bill_billing_period_start_date = (SELECT max_billing_date FROM max_date)\nGROUP BY\n  line_item_product_code, line_item_usage_account_id\nHAVING\n  ROUND(SUM(line_item_unblended_cost), 2) > 5.0\nORDER BY\n  \"Cost (USD)\" DESC;",
+          "refId": "Highest cost by account and product",
+          "table": "$table"
+        }
+      ],
+      "title": "Current months highest costs by account",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-athena-datasource",
+        "uid": "${datasource}"
+      },
+      "description": "Visualizes the cost per $frequency of a chosen AWS product ($aws_product) by account. Note that under normal circumstances the current day will appear to be lower as it is not yet fully summed up.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 9
+      },
+      "id": 2,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "connectionArgs": {
+            "catalog": "__default",
+            "database": "__default",
+            "region": "__default",
+            "resultReuseEnabled": false,
+            "resultReuseMaxAgeInMinutes": 60
+          },
+          "datasource": {
+            "type": "grafana-athena-datasource",
+            "uid": "${datasource}"
+          },
+          "format": 0,
+          "key": "Q-5167a661-0ff1-4883-b594-748e1a861acf-0",
+          "rawSQL": "-- Author: Ægir Máni Hauksson (@hauks96)\nSELECT\n  date_trunc('$frequency', aws.line_item_usage_start_date) as freq,\n  aws.line_item_product_code,\n  m.account_name,\n  ROUND(SUM(aws.line_item_unblended_cost), 2) AS \"Daily Cost\"\nFROM\n  $__table aws\nLEFT JOIN\n  $account_names_table m -- LEFT JOIN in case the account mapping table is missing any account ids\nON\n  aws.line_item_usage_account_id = m.account_id\nWHERE\n  $__dateFilter(aws.line_item_usage_start_date) AND aws.line_item_product_code = '$aws_product'\nGROUP BY\n  date_trunc('$frequency', aws.line_item_usage_start_date), aws.line_item_product_code, m.account_name\nORDER BY\n  freq ASC;",
+          "refId": "daily product cost by account",
+          "table": "$table"
+        }
+      ],
+      "title": "Product cost by account",
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "valueLabel": "account_name"
+          }
+        }
+      ],
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-athena-datasource",
+        "uid": "${datasource}"
+      },
+      "description": "Visualizes the total cost per $frequency of each account. Note that under normal circumstances the current day will appear to be lower as it is not yet fully summed up.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 13,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "connectionArgs": {
+            "catalog": "__default",
+            "database": "__default",
+            "region": "__default",
+            "resultReuseEnabled": false,
+            "resultReuseMaxAgeInMinutes": 60
+          },
+          "datasource": {
+            "type": "grafana-athena-datasource",
+            "uid": "${datasource}"
+          },
+          "format": 0,
+          "key": "Q-5167a661-0ff1-4883-b594-748e1a861acf-0",
+          "rawSQL": "-- Author: Ægir Máni Hauksson (@hauks96)\nSELECT\n  date_trunc('$frequency', aws.line_item_usage_start_date) as freq,\n  m.account_name,\n  ROUND(SUM(aws.line_item_unblended_cost), 2) AS \"Daily Cost\"\nFROM\n  $__table aws\nLEFT JOIN\n  $account_names_table m -- LEFT JOIN in case the account mapping table is missing any account ids\nON\n  aws.line_item_usage_account_id = m.account_id\nWHERE\n  $__dateFilter(aws.line_item_usage_start_date)\nGROUP BY\n  date_trunc('$frequency', aws.line_item_usage_start_date), m.account_name\nORDER BY\n  freq ASC;",
+          "refId": "daily product cost by account",
+          "table": "$table"
+        }
+      ],
+      "title": "Total cost for each account",
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "valueLabel": "account_name"
+          }
+        }
+      ],
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-athena-datasource",
+        "uid": "${datasource}"
+      },
+      "description": "Visualizes the cost per $frequency of a chosen AWS account ($aws_account) by product. Note that under normal circumstances the current day will appear to be lower as it is not yet fully summed up.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 19
+      },
+      "id": 3,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "connectionArgs": {
+            "catalog": "__default",
+            "database": "__default",
+            "region": "__default",
+            "resultReuseEnabled": false,
+            "resultReuseMaxAgeInMinutes": 60
+          },
+          "datasource": {
+            "type": "grafana-athena-datasource",
+            "uid": "${datasource}"
+          },
+          "format": 0,
+          "rawSQL": "-- Author: Ægir Máni Hauksson (@hauks96)\nSELECT\n  date_trunc('$frequency', aws.line_item_usage_start_date) as freq,\n  aws.line_item_product_code,\n  m.account_name,\n  ROUND(SUM(aws.line_item_unblended_cost), 2) AS \"Daily Cost\"\nFROM\n  $__table aws\nLEFT JOIN\n  $account_names_table m -- LEFT JOIN in case the account mapping table is missing any account ids\nON\n  aws.line_item_usage_account_id = m.account_id\nWHERE\n  $__dateFilter(aws.line_item_usage_start_date) AND m.account_name = '$aws_account'\nGROUP BY\n  date_trunc('$frequency', aws.line_item_usage_start_date), aws.line_item_product_code, m.account_name\nORDER BY\n  freq ASC;",
+          "refId": "Account cost by service",
+          "table": "$table"
+        }
+      ],
+      "title": "Account cost by service",
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "valueLabel": "line_item_product_code"
+          }
+        }
+      ],
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "30m",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": [
+    "AWS",
+    "Billing"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "",
+          "value": ""
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "Datasource",
+        "multi": false,
+        "name": "datasource",
+        "options": [],
+        "query": "grafana-athena-datasource",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "type": "datasource"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "account_names",
+          "value": "account_names"
+        },
+        "description": "Name of the table containing the account ID to account name mappings",
+        "hide": 2,
+        "includeAll": false,
+        "multi": false,
+        "name": "account_names_table",
+        "options": [
+          {
+            "selected": true,
+            "text": "account_names",
+            "value": "account_names"
+          }
+        ],
+        "query": "account_names",
+        "skipUrlSync": false,
+        "type": "custom"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "",
+          "value": ""
+        },
+        "datasource": {
+          "type": "grafana-athena-datasource",
+          "uid": "${datasource}"
+        },
+        "definition": "",
+        "description": "The cost usage report table name",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Table",
+        "multi": false,
+        "name": "table",
+        "options": [],
+        "query": {
+          "connectionArgs": {
+            "catalog": "__default",
+            "database": "__default",
+            "region": "__default",
+            "resultReuseEnabled": false,
+            "resultReuseMaxAgeInMinutes": 60
+          },
+          "format": 1,
+          "rawSQL": "show tables"
+        },
+        "refresh": 1,
+        "regex": "^(?!cost_and_usage_data_status).+$",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "",
+          "value": ""
+        },
+        "datasource": {
+          "type": "grafana-athena-datasource",
+          "uid": "${datasource}"
+        },
+        "definition": "",
+        "description": "Select which account to view in specific panels",
+        "hide": 0,
+        "includeAll": false,
+        "label": "AWS Account",
+        "multi": false,
+        "name": "aws_account",
+        "options": [],
+        "query": {
+          "connectionArgs": {
+            "catalog": "__default",
+            "database": "__default",
+            "region": "__default",
+            "resultReuseEnabled": false,
+            "resultReuseMaxAgeInMinutes": 60
+          },
+          "format": 1,
+          "rawSQL": "SELECT DISTINCT m.account_name FROM $__table LEFT JOIN $account_names_table m ON line_item_usage_account_id = m.account_id;",
+          "table": "$table"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "AmazonVPC",
+          "value": "AmazonVPC"
+        },
+        "datasource": {
+          "type": "grafana-athena-datasource",
+          "uid": "${datasource}"
+        },
+        "definition": "",
+        "description": "Select which AWS product to view in specific panels",
+        "hide": 0,
+        "includeAll": false,
+        "label": "AWS Product",
+        "multi": false,
+        "name": "aws_product",
+        "options": [],
+        "query": {
+          "connectionArgs": {
+            "catalog": "__default",
+            "database": "__default",
+            "region": "__default",
+            "resultReuseEnabled": false,
+            "resultReuseMaxAgeInMinutes": 60
+          },
+          "format": 1,
+          "rawSQL": "SELECT DISTINCT line_item_product_code FROM $table"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": "Daily",
+          "value": "day"
+        },
+        "description": "Select which frequency you want to show in the graphs",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Graph frequency",
+        "multi": false,
+        "name": "frequency",
+        "options": [
+          {
+            "selected": true,
+            "text": "Daily",
+            "value": "day"
+          },
+          {
+            "selected": false,
+            "text": "Hourly",
+            "value": "hour"
+          },
+          {
+            "selected": false,
+            "text": "Monthly",
+            "value": "month"
+          }
+        ],
+        "query": "Daily : day, Hourly : hour, Monthly : month",
+        "queryValue": "",
+        "skipUrlSync": false,
+        "type": "custom"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-30d",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "AWS Organization Billing Dashboard",
+  "uid": "aws-org-cur-dashboard",
+  "version": 1,
+  "weekStart": ""
+}

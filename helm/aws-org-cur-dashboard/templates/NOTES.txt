@@ -1,0 +1,4 @@
+Your dashboard has been deployed!
+
+Dashboard UID: aws-org-cur-dashboard
+Datasource UID: {{ .Values.datasource.uid }}

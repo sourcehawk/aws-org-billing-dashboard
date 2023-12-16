@@ -1,0 +1,18 @@
+# See https://artifacthub.io/packages/helm/traefik/traefik for configuration
+ports:
+  traefik:
+    expose: true
+    nodePort: 32090
+  web:
+    nodePort: 32080
+  websecure:
+    nodePort: 32443
+  grafana:
+    nodePort: 32100
+    expose: true
+    exposedPort: 3456
+    port: 4000
+    protocol: TCP
+
+service:
+  type: NodePort

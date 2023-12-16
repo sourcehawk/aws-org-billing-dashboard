@@ -1,0 +1,30 @@
+{{- if .Values.externalSecrets.enabled }}
+# Athena datasource definition: https://grafana.com/grafana/plugins/grafana-athena-datasource/
+# There is multiple authentication methods, this is secret key authentication since we are using AWS Secrets Manager
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "common.fullname" . }}-athena-datasource-template
+  {{- if not (eq .Values.externalSecrets.secretStore.kind "ClusterSecretStore") }}
+  namespace: {{ .Values.externalSecrets.secretStore.namespace }}
+  {{- end }}
+data:
+  datasource.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: {{ .Values.datasource.name }}
+        type: grafana-athena-datasource
+        uid: {{ .Values.datasource.uid }}
+        jsonData:
+          authType: keys
+          defaultRegion: "{{ `{{ .defaultRegion }}` }}"
+          catalog: "{{ `{{ .catalog }}` }}" 
+          database: "{{ `{{ .database }}` }}" 
+          workgroup: "{{ `{{ .workgroup }}` }}"
+        secureJsonData:
+          accessKey: "{{ `{{ .accessKey }}` }}" 
+          secretKey: "{{ `{{ .secretKey }}` }}" 
+  labels: |
+    {{- include "common.labels" . | nindent 4 }}
+    {{- toYaml $.Values.datasource.labels | nindent 4 }}
+{{- end}}

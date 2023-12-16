@@ -1,0 +1,43 @@
+{{- if not .Values.externalSecrets.enabled }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "common.fullname" . }}-athena-datasource
+  labels:
+    {{- include "common.labels" . | nindent 4 }}
+    {{- toYaml $.Values.datasource.labels | nindent 4 }}
+type: Opaque
+stringData:
+  datasource.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: {{ .Values.datasource.name | quote }}
+        type: grafana-athena-datasource
+        uid: {{ .Values.datasource.uid | quote }}
+        jsonData:
+          authType: {{ .Values.datasource.auth.type | quote }}
+          defaultRegion: {{ .Values.datasource.config.defaultRegion | quote }}
+          {{- if eq .Values.datasource.auth.type "default" }}
+          assumeRoleArn: {{ .Values.datasource.auth.default.assumeRoleArn | quote }}
+          {{- end }}
+          {{- if eq .Values.datasource.auth.type "credentials" }}
+          profile: {{ .Values.datasource.auth.credentials.profile | quote }}
+          {{- end }}
+          catalog: {{ .Values.datasource.config.catalog | quote }}
+          database: {{ .Values.datasource.config.database | quote }}
+          workgroup: {{ .Values.datasource.config.workgroup | quote }}
+          {{- if .Values.datasource.config.endpoint }}
+          endpoint: {{ .Values.datasource.config.endpoint | quote }}
+          {{- end }}
+          {{- if .Values.datasource.config.externalId }}
+          externalId: {{ .Values.datasource.config.externalId | quote }}
+          {{- end }}
+          {{- if .Values.datasource.config.outputLocation }}
+          outputLocation: {{ .Values.datasource.config.outputLocation | quote }}
+          {{- end }}
+        {{- if eq .Values.datasource.auth.type "keys" }}
+        secureJsonData:
+          accessKey: {{ .Values.datasource.auth.keys.accessKey | quote }}
+          secretKey: {{ .Values.datasource.auth.keys.secretKey | quote }} 
+        {{- end }}
+{{- end}}

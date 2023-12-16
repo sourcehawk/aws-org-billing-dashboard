@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "common.fullname" . }}-test-scripts
+  labels:
+    {{- include "common.labels" . | nindent 4 }}
+data:
+  test_datasource.py: |
+{{ .Files.Get "scripts/test_datasource.py" | indent 4 }}
+  test_dashboard.py: |
+{{ .Files.Get "scripts/test_dashboard.py" | indent 4 }}

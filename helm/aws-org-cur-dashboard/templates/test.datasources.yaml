@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "common.fullname" . }}-validation-datasources
+  labels:
+    {{- include "common.labels" . | nindent 4 }}
+data:
+  manual_key.yaml: |
+{{ .Files.Get "validation-datasources/manual-key-datasource.yaml" | indent 4 }}
+  manual_credentials.yaml: |
+{{ .Files.Get "validation-datasources/manual-profile-datasource.yaml" | indent 4 }}
+  manual_default.yaml: |
+{{ .Files.Get "validation-datasources/manual-sdk-datasource.yaml" | indent 4 }}
+  cluster_secret_store.yaml: |
+{{ .Files.Get "validation-datasources/cluster-secret-store-datasource.yaml" | indent 4 }}
+  secret_store.yaml: |
+{{ .Files.Get "validation-datasources/secret-store-datasource.yaml" | indent 4 }}

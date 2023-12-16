@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "common.fullname" . }}-athena-dashboards
+  {{- if and .Values.externalSecrets.enabled (not (eq .Values.externalSecrets.secretStore.kind "ClusterSecretStore")) }}
+  namespace: {{ .Values.externalSecrets.secretStore.namespace }}
+  {{- end }}
+  labels:
+    {{- include "common.labels" . | nindent 4 }}
+    {{- toYaml .Values.dashboard.labels | nindent 4 }}
+  annotations:
+    {{- toYaml .Values.dashboard.annotations | nindent 4 }}
+data:
+  organization-billing-dashboard.json: |
+{{ .Files.Get "dashboards/organization-billing-dashboard.json" | indent 4 }}

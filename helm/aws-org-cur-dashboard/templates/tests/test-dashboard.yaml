@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ include "common.fullname" . }}-test-dashboard
+  labels:
+    {{- include "common.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-delete-policy: hook-succeeded
+    helm.sh/hook-weight: "2"
+spec:
+  containers:
+    - name: python
+      image: python:3.11-slim
+      command:
+      - /bin/sh
+      - -c
+      - |
+        pip install requests
+        pip install pytest
+        pytest /scripts/test_dashboard.py --disable-warnings
+      env:
+        - name: GRAFANA_URL
+          value: {{ .Values.test.grafana_url | quote }}
+        - name: GRAFANA_USER
+          value: {{ .Values.test.grafana_user | quote }}
+        - name: GRAFANA_PASSWORD
+          value: {{ .Values.test.grafana_password | quote }}
+        - name: DASHBOARD_UID
+          value: "aws-org-cur-dashboard"
+        - name: DASHBOARD_FILE
+          value: /dashboards/organization-billing-dashboard.json
+      volumeMounts:
+        - name: scripts
+          mountPath: /scripts
+  # We could also mount the dashboard configmap here, but it's not necessary
+  volumes:
+    - name: scripts
+      configMap:
+        name: {{ include "common.fullname" . }}-test-scripts
+        defaultMode: 0744
+  restartPolicy: Never
