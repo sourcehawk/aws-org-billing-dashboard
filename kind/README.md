@@ -25,7 +25,7 @@ Please make sure you understand the consequences of tearing down the cluster bef
 
 Install helm:
 
-> helm upgrade --install aws-cur ./helm/aws-org-cur-dashboard -f ./helm/aws-org-cur-dashboard/ci/secretstore-cluster-values.yaml
+> helm upgrade --install aws-cur ./charts/aws-org-cur-dashboard -f ./charts/aws-org-cur-dashboard/ci/secretstore-cluster-values.yaml
 
 Test helm chart:
 
