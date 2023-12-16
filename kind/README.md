@@ -31,6 +31,10 @@ Get yaml template from errored chart lint
 
 > helm template --debug charts/aws-org-cur-dashboard/ > debug.txt
 
+Get yaml template from errored chart lint using values file
+
+> helm template --debug charts/aws-org-cur-dashboard/ -f charts/aws-org-cur-dashboards/ci/manual-key-values.yaml > debug.txt
+
 Install helm:
 
 > helm upgrade --install aws-cur ./charts/aws-org-cur-dashboard -f ./charts/aws-org-cur-dashboard/ci/secretstore-cluster-values.yaml
