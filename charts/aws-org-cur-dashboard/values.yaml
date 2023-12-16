@@ -53,9 +53,10 @@ datasource:
     workgroup: ""
     catalog: ""
     database: ""
-    endpoint: "" # Optional
-    externalId: "" # Optional
-    outputLocation: "" # Optional
+    # Optional values
+    endpoint: ""
+    externalId: ""
+    outputLocation: ""
 
   # Set the authentication method (Ignored if externalSecrets.enabled is true)
   auth:
