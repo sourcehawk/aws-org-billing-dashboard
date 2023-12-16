@@ -1,4 +1,18 @@
 Your dashboard has been deployed!
 
-Dashboard UID: aws-org-cur-dashboard
-Datasource UID: {{ .Values.datasource.uid }}
+Dashboard UID  : aws-org-cur-dashboard
+Datasource UID : {{ .Values.datasource.uid }}
+Authentication : 
+{{- if and .Values.externalSecrets.enabled (eq .Values.externalSecrets.secretStore.kind "ClusterSecretStore") }}
+{{- printf " ClusterSecretStore with access and secret key" }}
+{{- else if and .Values.externalSecrets.enabled (eq .Values.externalSecrets.secretStore.kind "SecretStore") }}
+{{- printf " SecretStore with access and secret key" }}
+{{- else if .Values.externalSecrets.enabled }}
+  {{- fail "value for .Values.externalSecrets.secretStore.kind must be either 'ClusterSecretStore' or 'SecretStore'" }}
+{{- else if eq .Values.datasource.auth.type "keys" }}
+{{- printf " Manually assigned access and secret key" }}
+{{- else if eq .Values.datasource.auth.type "credentials" }}
+{{- printf " Manually assigned profile" }}
+{{- else if eq .Values.datasource.auth.type "default"}}
+{{- printf " Manually assigned role" }}
+{{- end}}
