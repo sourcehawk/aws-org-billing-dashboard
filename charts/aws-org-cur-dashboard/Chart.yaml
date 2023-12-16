@@ -1,25 +1,33 @@
 apiVersion: v2
+
 name: aws-org-cur-dashboard
-description: A Helm chart for Kubernetes which deploys a Grafana dashboard for AWS organization Cost and Usage Reports
+
+description:
+  Deploy a Grafana dashboard for AWS Organization Cost and Usage Reports.
+  View reports for all accounts in an AWS Organization in a single dashboard.
+  Requires a specific AWS infrastructure setup, see project source for details.
+
 icon: https://i.ibb.co/3dMsZdX/awsorg.png
 
-# A chart can be either an 'application' or a 'library' chart.
-#
-# Application charts are a collection of templates that can be packaged into versioned archives
-# to be deployed.
-#
-# Library charts provide useful utilities or functions for the chart developer. They're included as
-# a dependency of application charts to inject those utilities and functions into the rendering
-# pipeline. Library charts do not define any templates and therefore cannot be deployed.
+home: https://github.com/hauks96/aws-org-billing-dashboard
+
+sources:
+  - https://github.com/hauks96/aws-org-billing-dashboard
+
+maintainers:
+  - name: hauks96
+    email: agir96@gmail.com
+    url: https://github.com/hauks96
+
+keywords:
+  - AWS
+  - Organization
+  - Grafana
+  - Dashboard
+  - Cost and Usage Reports
+  - CUR
+  - Billing
+
 type: application
-
-# This is the chart version. This version number should be incremented each time you make changes
-# to the chart and its templates, including the app version.
-# Versions are expected to follow Semantic Versioning (https://semver.org/)
 version: 1.0.0
-
-# This is the version number of the application being deployed. This version number should be
-# incremented each time you make changes to the application. Versions are not expected to
-# follow Semantic Versioning. They should reflect the version the application is using.
-# It is recommended to use it with quotes.
 appVersion: "1.0.0"
