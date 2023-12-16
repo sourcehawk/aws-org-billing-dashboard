@@ -39,7 +39,7 @@ helm.sh/chart: {{ include "common.chart" . | quote }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
-{{ range $key, $value := .Values.defaultLabels }}
+{{- range $key, $value := .Values.defaultLabels }}
 {{- $key }}: {{ $value | quote }}
 {{- end }}
 {{- end }}

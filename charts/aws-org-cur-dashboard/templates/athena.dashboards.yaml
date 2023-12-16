@@ -7,9 +7,13 @@ metadata:
   {{- end }}
   labels:
     {{- include "common.labels" . | nindent 4 }}
+    {{- if .Values.dashboard.labels }}
     {{- toYaml .Values.dashboard.labels | nindent 4 }}
+    {{- end }}
   annotations:
+    {{- if .Values.dashboard.annotations }}
     {{- toYaml .Values.dashboard.annotations | nindent 4 }}
+    {{- end }}
 data:
-  organization-billing-dashboard.json: |
+  organization_billing_dashboard.json: |
 {{ .Files.Get "dashboards/organization-billing-dashboard.json" | indent 4 }}

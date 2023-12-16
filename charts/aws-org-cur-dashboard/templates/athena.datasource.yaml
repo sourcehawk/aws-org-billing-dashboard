@@ -5,7 +5,9 @@ metadata:
   name: {{ include "common.fullname" . }}-athena-datasource
   labels:
     {{- include "common.labels" . | nindent 4 }}
-    {{- toYaml $.Values.datasource.labels | nindent 4 }}
+    {{- if .Values.datasource.labels }}
+    {{- toYaml .Values.datasource.labels | nindent 4 }}
+    {{- end }}
 type: Opaque
 stringData:
   datasource.yaml: |

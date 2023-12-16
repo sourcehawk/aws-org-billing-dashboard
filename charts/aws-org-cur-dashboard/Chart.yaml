@@ -1,6 +1,7 @@
 apiVersion: v2
 name: aws-org-cur-dashboard
 description: A Helm chart for Kubernetes which deploys a Grafana dashboard for AWS organization Cost and Usage Reports
+icon: https://i.ibb.co/3dMsZdX/awsorg.png
 
 # A chart can be either an 'application' or a 'library' chart.
 #

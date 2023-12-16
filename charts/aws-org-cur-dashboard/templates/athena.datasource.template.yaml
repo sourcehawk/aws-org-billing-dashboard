@@ -26,5 +26,7 @@ data:
           secretKey: "{{ `{{ .secretKey }}` }}" 
   labels: |
     {{- include "common.labels" . | nindent 4 }}
-    {{- toYaml $.Values.datasource.labels | nindent 4 }}
+    {{- if .Values.datasource.labels }}
+    {{- toYaml .Values.datasource.labels | nindent 4 }}
+    {{- end }}
 {{- end}}
