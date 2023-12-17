@@ -38,7 +38,7 @@ environment = "dev"
 
 ## Steps to Run Terraform Code
 
-_this is just an example, you can run it however you pleas_
+_this is just an example, you can run it however you please_
 
 1. Clone this repository to your local machine:
 
