@@ -11,13 +11,13 @@ This folder contains scripts and configuration files for setting up a Kubernetes
 
 1. Run the `setup.sh` script to set up the Kubernetes cluster. This script installs the necessary dependencies and tools, configures the cluster by creating the necessary resources, and deploys the applications and services onto the cluster. Grafana will be exposed at [localhost:4000](http://localhost:4000)
 
-   > ./setup.sh
+   > ./scripts/setup.sh
 
 ## Teardown
 
 2. Run the `teardown.sh` script to tear down the Kubernetes cluster. This script deletes all the resources associated with the cluster and cleans up any remaining dependencies and tools.
 
-   > ./teardown.sh
+   > ./scripts/teardown.sh
 
 Please make sure you understand the consequences of tearing down the cluster before executing the `teardown.sh` script.
 
