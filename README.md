@@ -1,6 +1,6 @@
 # Grafana CUR Dashboard for AWS Organizations
 
-![AWS Organization Billing Dashboard](https://ibb.co/G3tnCVw)
+![AWS Organization Billing Dashboard](https://i.ibb.co/mFXbhHs/aws-org-cur-dashboard.png)
 
 This project provides a dashboard and infrastructure for AWS organization cost and usage report. It uses Terraform to provision the infrastructure and Helm to deploy the dashboard. You can also ignore helm entirely and import the dashboard and set the datasource manually. Some statistics in the dashboard will not be available until you have two months of billing reports.
 
