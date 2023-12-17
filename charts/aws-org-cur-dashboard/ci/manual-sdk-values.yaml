@@ -1,5 +1,5 @@
 nameOverride: ""
-fullnameOverride: "aws-cur"
+fullnameOverride: ""
 
 defaultLabels:
   test: "test-manual-sdk"
