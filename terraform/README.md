@@ -1,8 +1,8 @@
 # Terraform AWS Org Billing Dashboard
 
-This repository contains Terraform code to deploy an AWS Organization Billing Dashboard.
-
-![AWS Org Billing Dashboard Example](https://i.ibb.co/mFXbhHs/aws-org-cur-dashboard.png)
+This repository contains Terraform code to deploy cost and usage report automation with
+an athena querier. Note that once deployed, you will have to wait up to 24 hours to get your first report from AWS.
+Some statistics in the dashboard will not be available until you have two months of billing reports.
 
 ## Prerequisites
 
@@ -72,7 +72,7 @@ terraform init -backend=targets/dev.tfbackend
 4. Review the Terraform plan to see what resources will be created:
 
 ```bash
-terraform plan -var-file=dev.tfvars -out=tfplan
+terraform plan -var-file=targets/dev.tfvars -out=tfplan
 ```
 
 5. If everything looks good, apply the Terraform changes:

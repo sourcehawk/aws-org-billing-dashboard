@@ -24,6 +24,7 @@ module "cur_glue_database" {
 | -------------------------- | ------------------------------------------------------------------------ |
 | glue_catalog_database_name | The name of the AWS Glue catalog database for the cost and usage report. |
 | billing_report_bucket_name | The name of the S3 bucket where billing reports are stored.              |
+| accounts                   | The accounts found in the organization                                   |
 
 ## Requirements
 
