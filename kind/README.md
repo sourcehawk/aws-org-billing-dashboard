@@ -5,7 +5,7 @@ This folder contains scripts and configuration files for setting up a Kubernetes
 ## Prerequisites
 
 - Docker: Make sure Docker is installed on your machine. You can download Docker from [here](https://www.docker.com/products/docker-desktop).
-- kind: Install kind by following the instructions [here](https://kind.sigs.k8s.io/docs/user/quick-start/#installation).
+- kind: Install kind by following the instructions [here](https://kind.sigs.k8s.io/docs/user/quick-start/#installation). If you use asdf, make sure to run the command `asdf reshim golang` after installing kind.
 
 ## Setup
 

@@ -1,31 +1,18 @@
 # Terraform AWS Org Billing Dashboard
 
-This repository contains Terraform code to deploy cost and usage report automation with
-an athena querier. Note that once deployed, you will have to wait up to 24 hours to get your first report from AWS.
-Some statistics in the dashboard will not be available until you have two months of billing reports.
-
-## Prerequisites
-
-Before you can run the Terraform code, make sure you have the following prerequisites:
-
-- [Terraform](https://www.terraform.io/downloads.html) installed on your local machine.
-- AWS CLI installed and configured with your AWS account credentials.
+This repository contains Terraform code to deploy cost and usage report automation with an Athena querier. Please note that it may take up to 24 hours to receive your first report from AWS after deployment. Additionally, some statistics in the dashboard will only be available once you have two months of billing reports.
 
 ## Authorize with AWS Configure SSO
 
-Make sure the account you use is a "management account" in your organization. Otherwise you may not be able to retrieve account information.
+Make sure that the account you use is a "management account" in your organization. Otherwise, you may not be able to retrieve account information.
 
 To authorize with AWS Configure SSO, follow these steps:
 
-1. Install the AWS CLI v2 if you haven't already. Refer to the [AWS CLI v2 installation guide](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) for instructions.
+1. If you haven't already, install the AWS CLI v2. Refer to the [AWS CLI v2 installation guide](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) for instructions.
 
-2. Configure AWS SSO by running the following command:
+2. The following command will prompt you to select the AWS SSO profile to use and authenticate with your AWS SSO credentials.:
 
-```bash
-aws configure sso
-```
-
-This command will prompt you to select the AWS SSO profile to use and authenticate with your AWS SSO credentials.
+   > aws configure sso
 
 3. Once authenticated, you can use the AWS CLI with the configured SSO profile to interact with your AWS resources.
 
@@ -51,42 +38,30 @@ environment = "dev"
 
 ## Steps to Run Terraform Code
 
+_this is just an example, you can run it however you pleas_
+
 1. Clone this repository to your local machine:
 
-```bash
-git clone https://github.com/your-username/aws-org-billing-dashboard.git
-```
+   > git clone https://github.com/hauks96/aws-org-billing-dashboard.git
 
 2. Change into the Terraform directory:
 
-```bash
-cd aws-org-billing-dashboard/terraform
-```
+   > cd aws-org-billing-dashboard/terraform
 
 3. Initialize the Terraform working directory:
 
-```bash
-terraform init -backend=targets/dev.tfbackend
-```
+   > terraform init -backend=targets/dev.tfbackend
 
 4. Review the Terraform plan to see what resources will be created:
 
-```bash
-terraform plan -var-file=targets/dev.tfvars -out=tfplan
-```
+   > terraform plan -var-file=targets/dev.tfvars -out=tfplan
 
 5. If everything looks good, apply the Terraform changes:
 
-```bash
-terraform apply tfplan
-```
-
-You will be prompted to confirm the changes. Enter `yes` to proceed.
+   > terraform apply tfplan
 
 6. Wait for Terraform to provision the resources. Once completed, you will see the output with the created resources.
 
 7. Destroy
 
-```bash
-terraform destroy -var-file=targets/dev.tfvars
-```
+   > terraform destroy -var-file=targets/dev.tfvars
