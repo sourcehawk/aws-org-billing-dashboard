@@ -4,6 +4,9 @@ metadata:
   name: {{ include "common.fullname" . }}-test-scripts
   labels:
     {{- include "common.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook-delete-policy: hook-succeeded
+    helm.sh/hook-weight: "0"
 data:
   test_datasource.py: |
 {{ .Files.Get "scripts/test_datasource.py" | indent 4 }}

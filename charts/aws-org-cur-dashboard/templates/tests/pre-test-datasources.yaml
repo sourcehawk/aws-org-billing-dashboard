@@ -4,6 +4,9 @@ metadata:
   name: {{ include "common.fullname" . }}-validation-datasources
   labels:
     {{- include "common.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook-delete-policy: hook-succeeded
+    helm.sh/hook-weight: "0"
 data:
   manual_key.yaml: |
 {{ .Files.Get "validation-datasources/manual-key-datasource.yaml" | indent 4 }}
