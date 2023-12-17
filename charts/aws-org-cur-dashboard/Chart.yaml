@@ -9,15 +9,15 @@ description:
 
 icon: https://i.ibb.co/3dMsZdX/awsorg.png
 
-home: https://github.com/hauks96/aws-org-billing-dashboard
+home: https://github.com/sourcehawk/aws-org-billing-dashboard
 
 sources:
-  - https://github.com/hauks96/aws-org-billing-dashboard
+  - https://github.com/sourcehawk/aws-org-billing-dashboard
 
 maintainers:
-  - name: hauks96
+  - name: sourcehawk
     email: agir96@gmail.com
-    url: https://github.com/hauks96
+    url: https://github.com/sourcehawk
 
 keywords:
   - AWS
@@ -29,5 +29,5 @@ keywords:
   - Billing
 
 type: application
-version: 1.0.0
+version: 1.0.1
 appVersion: "1.0.0"
