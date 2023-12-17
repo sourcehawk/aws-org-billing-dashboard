@@ -18,8 +18,6 @@ The project is organized into two main directories:
 
 To use this project, you will need the following:
 
-## Requirements
-
 | Requirement                                             | Required | Description                                                         |
 | ------------------------------------------------------- | -------- | ------------------------------------------------------------------- |
 | [Terraform](https://www.terraform.io/downloads.html)    | Yes      | To deploy infrastructure                                            |
@@ -27,6 +25,7 @@ To use this project, you will need the following:
 | [Helm](https://helm.sh/docs/intro/install/)             | No       | If you want to deploy the dashboard to Grafana hosted in Kubernetes |
 | [asdf](https://asdf-vm.com/#/core-manage-asdf)          | No       | For managing versions of multiple runtime environments              |
 | [Kind](https://kind.sigs.k8s.io/docs/user/quick-start/) | No       | For local Kubernetes cluster setup.                                 |
+| [kubectl](https://kubernetes.io/docs/tasks/tools/)      | No       | For interacting with Kubernetes clusters                            |
 
 ### Usage
 
