@@ -15,7 +15,7 @@ class DashboardNotFound(Exception):
 # pylint: disable=attribute-defined-outside-init
 class TestDashboard:
     """
-    Verify that the datasource is correctly set up.
+    Verify that the dashboard is picked up by grafana.
     Requires grafana to be set up.
     """
     @pytest.fixture(autouse=True)

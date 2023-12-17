@@ -56,7 +56,7 @@
     }
   },
   "test": {
-    "grafana_url": "http://grafana",
+    "grafana_url": "http://grafana.default.svc.cluster.local",
     "grafana_user": "admin",
     "grafana_password": "admin"
   }
