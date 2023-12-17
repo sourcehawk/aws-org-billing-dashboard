@@ -17,8 +17,6 @@ externalSecrets:
     kind: ClusterSecretStore
     # Name of the secret store
     name: ""
-    # Namespace of the secret store (Ignored if kind is ClusterSecretStore)
-    namespace: ""
 
   # Define the secret in the secret store
   secret:

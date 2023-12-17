@@ -6,7 +6,7 @@ kind: ConfigMap
 metadata:
   name: {{ include "common.fullname" . }}-athena-datasource-template
   {{- if not (eq .Values.externalSecrets.secretStore.kind "ClusterSecretStore") }}
-  namespace: {{ .Values.externalSecrets.secretStore.namespace }}
+  namespace: {{ .Release.Namespace }}
   {{- end }}
 data:
   datasource.yaml: |
