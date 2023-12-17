@@ -42,7 +42,7 @@ _this is just an example, you can run it however you please_
 
 1. Clone this repository to your local machine:
 
-   > git clone https://github.com/hauks96/aws-org-billing-dashboard.git
+   > git clone https://github.com/sourcehawk/aws-org-billing-dashboard.git
 
 2. Change into the Terraform directory:
 
