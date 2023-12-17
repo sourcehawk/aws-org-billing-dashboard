@@ -1,0 +1,29 @@
+nameOverride: ""
+fullnameOverride: "aws-cur"
+
+defaultLabels:
+  test: "test-manual-profile"
+
+datasource:
+  name: "Amazon Athena Test"
+  uid: "amazon_athena"
+  labels:
+    grafana_datasource: "1"
+  config:
+    defaultRegion: "eu-west-2"
+    workgroup: "test-workgroup-manual-profile"
+    catalog: "test-catalog-manual-profile"
+    database: "test-database-manual-profile"
+    endpoint: "test-endpoint-manual-profile"
+    externalId: "test-external-id-manual-profile"
+    outputLocation: "test-output-location-manual-profile"
+  auth:
+    type: credentials
+    credentials:
+      profile: "test-profile-key"
+
+dashboard:
+  labels:
+    grafana_dashboard: "1"
+  annotations:
+    dashboard-target-directory: "/tmp/dashboards/aws"

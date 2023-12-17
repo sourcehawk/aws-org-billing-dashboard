@@ -1,0 +1,17 @@
+apiVersion: 1
+datasources:
+  - name: "Amazon Athena Test"
+    type: grafana-athena-datasource
+    uid: "amazon_athena"
+    jsonData:
+      authType: "keys"
+      defaultRegion: "eu-west-1"
+      catalog: "test-catalog-manual-key"
+      database: "test-database-manual-key"
+      workgroup: "test-workgroup-manual-key"
+      endpoint: "test-endpoint-manual-key"
+      externalId: "test-external-id-manual-key"
+      outputLocation: "test-output-location-manual-key"
+    secureJsonData:
+      accessKey: "test-access-key-manual-key"
+      secretKey: "test-secret-key-manual-key"

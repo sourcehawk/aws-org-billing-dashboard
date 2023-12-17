@@ -1,0 +1,33 @@
+apiVersion: v2
+
+name: aws-org-cur-dashboard
+
+description:
+  Deploy a Grafana dashboard for AWS Organization Cost and Usage Reports.
+  View reports for all accounts in an AWS Organization in a single dashboard.
+  Requires a specific AWS infrastructure setup, see project source for details.
+
+icon: https://i.ibb.co/3dMsZdX/awsorg.png
+
+home: https://github.com/hauks96/aws-org-billing-dashboard
+
+sources:
+  - https://github.com/hauks96/aws-org-billing-dashboard
+
+maintainers:
+  - name: hauks96
+    email: agir96@gmail.com
+    url: https://github.com/hauks96
+
+keywords:
+  - AWS
+  - Organization
+  - Grafana
+  - Dashboard
+  - Cost and Usage Reports
+  - CUR
+  - Billing
+
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
