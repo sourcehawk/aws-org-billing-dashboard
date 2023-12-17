@@ -19,7 +19,7 @@ nodes:
       - containerPort: 32443
         hostPort: 8001
         protocol: TCP
-      # Expose grafana entrypoint on host at port 4444
+      # Expose grafana entrypoint on host at port 4000
       - containerPort: 32100
         hostPort: 4000
         protocol: TCP
