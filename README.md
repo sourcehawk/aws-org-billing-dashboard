@@ -12,7 +12,7 @@ The project is organized into two main directories:
 
 - `terraform/`: Contains Terraform modules for setting up the AWS infrastructure, including Glue Catalog Database, Glue Crawlers, and an S3 bucket for storing AWS Cost and Usage Reports (CUR). It also includes a Grafana workspace with an Athena data source for visualizing the CUR data.
 
-- `helm/`: Contains Helm chart for deploying the dashboard and datasource.
+- `charts/`: Contains Helm chart for deploying the dashboard and datasource.
 
 ### Requirements
 
@@ -38,7 +38,7 @@ To use this project, follow these steps:
 - `terraform plan`
 - `terraform apply`
 
-3. If you have Grafana deployed in Kubernetes, navigate to the `helm/` directory and deploy the dashboard using Helm with the appropriate values. Alternatively, if you have Grafana deployed by other means, you can set up the datasource manually using [this documentation](https://grafana.com/grafana/plugins/grafana-athena-datasource/?tab=overview) as a reference and import the dashboards from the Helm chart.
+3. If you have Grafana deployed in Kubernetes, navigate to the `charts/` directory and deploy the dashboard using Helm with the appropriate values. Alternatively, if you have Grafana deployed by other means, you can set up the datasource manually using [this documentation](https://grafana.com/grafana/plugins/grafana-athena-datasource/?tab=overview) as a reference and import the dashboards from the Helm chart.
 
 ## License
 
