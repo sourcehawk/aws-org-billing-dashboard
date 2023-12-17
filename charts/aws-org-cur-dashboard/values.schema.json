@@ -7,8 +7,7 @@
     "enabled": false,
     "secretStore": {
       "kind": "ClusterSecretStore",
-      "name": "",
-      "namespace": ""
+      "name": ""
     },
     "secret": {
       "name": "grafana-athena-datasource",
