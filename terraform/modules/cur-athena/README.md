@@ -1,6 +1,6 @@
 # cur-athena Terraform Module
 
-This Terraform module creates a workgroup for Athena. This allows us to visualizing and analyze AWS Cost and Usage Report (CUR) data stored in an AWS Glue Catalog Database by querying with SQL through an athena datasource in grafana.
+This Terraform module creates a workgroup for Athena. This allows us to visualize and analyze AWS Cost and Usage Report (CUR) data stored in an AWS Glue Catalog Database by querying with SQL through an athena datasource in grafana.
 
 ## Usage
 
