@@ -19,7 +19,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 9,
+  "id": 1,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -96,7 +96,7 @@
               {
                 "id": "thresholds",
                 "value": {
-                  "mode": "percentage",
+                  "mode": "absolute",
                   "steps": [
                     {
                       "color": "green",
@@ -104,11 +104,11 @@
                     },
                     {
                       "color": "#EAB839",
-                      "value": 5
+                      "value": 0.125
                     },
                     {
                       "color": "red",
-                      "value": 10
+                      "value": 0.25
                     }
                   ]
                 }
@@ -949,8 +949,8 @@
       {
         "current": {
           "selected": false,
-          "text": "Amazon Athena Bakkend",
-          "value": "d65d7728-072f-418a-a7e8-c3844eac84bb"
+          "text": "Amazon Athena",
+          "value": "bd513124-365e-45c1-a3b7-5623dfb75993"
         },
         "hide": 0,
         "includeAll": false,
@@ -988,10 +988,9 @@
       },
       {
         "current": {
-          "isNone": true,
           "selected": false,
-          "text": "None",
-          "value": ""
+          "text": "cur_dev",
+          "value": "cur_dev"
         },
         "datasource": {
           "type": "grafana-athena-datasource",
@@ -1025,8 +1024,8 @@
       {
         "current": {
           "selected": false,
-          "text": "",
-          "value": ""
+          "text": "bakkend",
+          "value": "bakkend"
         },
         "datasource": {
           "type": "grafana-athena-datasource",
@@ -1061,8 +1060,8 @@
       {
         "current": {
           "selected": false,
-          "text": "AmazonVPC",
-          "value": "AmazonVPC"
+          "text": "AWSDataTransfer",
+          "value": "AWSDataTransfer"
         },
         "datasource": {
           "type": "grafana-athena-datasource",
@@ -1137,6 +1136,6 @@
   "timezone": "",
   "title": "AWS Organization Billing Dashboard",
   "uid": "aws-org-cur-dashboard",
-  "version": 2,
+  "version": 1,
   "weekStart": ""
 }
