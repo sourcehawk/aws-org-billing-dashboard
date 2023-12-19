@@ -50,7 +50,7 @@ _this is just an example, you can run it however you please_
 
 3. Initialize the Terraform working directory:
 
-   > terraform init -backend=targets/dev.tfbackend
+   > terraform init -backend-config=targets/dev.tfbackend
 
 4. Review the Terraform plan to see what resources will be created:
 
