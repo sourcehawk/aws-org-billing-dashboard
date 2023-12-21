@@ -4,7 +4,7 @@ This project provides a dashboard and infrastructure for AWS organization cost a
 
 Please note that some statistics in the dashboard will only be available once you have two months of billing reports.
 
-![AWS Organization Billing Dashboard](https://i.ibb.co/mFXbhHs/aws-org-cur-dashboard.png)
+![AWS Organization Billing Dashboard](https://i.ibb.co/2nYBJJR/Screenshot-from-2023-12-21-23-43-22.png)
 
 ### Project Structure
 
