@@ -32,9 +32,10 @@ module "athena_for_grafana" {
 
 ## Outputs
 
-| Name                         | Description                                                          |
-| ---------------------------- | -------------------------------------------------------------------- |
-| athena_access_iam_policy_arn | ARN of the IAM policy that grants access to Athena, workspace and S3 |
+| Name                         | Description                                                                              |
+| ---------------------------- | ---------------------------------------------------------------------------------------- |
+| athena_access_iam_policy_arn | ARN of the IAM policy that grants access to Athena, workspace and S3                     |
+| secret_id                    | Id of the secret that contains the datasource credentials. Null if create_secret = fales |
 
 ## Requirements
 

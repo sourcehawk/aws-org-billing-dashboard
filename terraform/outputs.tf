@@ -7,3 +7,8 @@ output "athena_access_iam_policy_arn" {
   value       = module.athena_for_grafana.athena_access_iam_policy_arn
   description = "ARN of the IAM policy that grants the required permissions to query CUR with Athena."
 }
+
+output "secret_id" {
+  value       = module.athena_for_grafana.secret_id
+  description = "ARN of the secret containing the credentials for the Athena datasource."
+}

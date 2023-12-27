@@ -32,13 +32,16 @@ To use this project, you will need the following:
 To use this project, follow these steps:
 
 1. Clone the repository.
-2. Navigate to the `terraform/` directory and run the following commands with the appropriate options to provision the AWS infrastructure:
+2. Authorize with the AWS CLI against a "management account" in your organization. (Will not be able to retrieve org data unless management account)
+3. Modify the `example.tfbackend` and `example.tfvars` at the root of the project to conform with your backend and target environment
 
-- `terraform init`
-- `terraform plan`
-- `terraform apply`
+- `terraform init -backend-config=targets/example.tfbackend`
+- `terraform plan -var-file=targets/example.tfvars -out=tfplan`
+- `terraform apply tfplan`
 
-3. If you have Grafana deployed in Kubernetes, navigate to the `charts/` directory and deploy the dashboard using Helm with the appropriate values. Alternatively, if you have Grafana deployed by other means, you can set up the datasource manually using [this documentation](https://grafana.com/grafana/plugins/grafana-athena-datasource/?tab=overview) as a reference and import the dashboards from the Helm chart.
+4. If you have Grafana deployed in Kubernetes, navigate to the `charts/` directory and deploy the dashboard using Helm with the appropriate values. Alternatively, if you have Grafana deployed by other means, you can set up the datasource manually using [this documentation](https://grafana.com/grafana/plugins/grafana-athena-datasource/?tab=overview) as a reference and import the dashboards from the Helm chart.
+
+Please note that it may take up to 24 hours to receive your first report from AWS after deployment. Additionally, some statistics in the dashboard will only be available once you have two months of billing reports.
 
 ## License
 
