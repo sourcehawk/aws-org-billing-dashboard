@@ -8,6 +8,7 @@ resource "aws_s3_bucket" "queries_athena" {
 
   tags = {
     "GrafanaDataSource" = "true"
+    "Name" = "athena-queries-${var.environment}"
   }
 }
 
