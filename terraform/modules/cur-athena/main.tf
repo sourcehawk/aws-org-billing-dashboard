@@ -17,8 +17,9 @@ resource "aws_s3_bucket" "queries_athena" {
 # ----------------------------------------------
 
 resource "aws_athena_workgroup" "athena_workgroup" {
-  name  = "athena-workgroup-${var.environment}"
-  state = "ENABLED"
+  name          = "athena-workgroup-${var.environment}"
+  state         = "ENABLED"
+  force_destroy = true
   configuration {
     result_configuration {
       output_location = "s3://${aws_s3_bucket.queries_athena.bucket}/"

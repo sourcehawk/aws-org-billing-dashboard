@@ -1,67 +1,48 @@
-# Terraform AWS Org Billing Dashboard
+# cur-aws Terraform Module
 
-This repository contains Terraform code to deploy cost and usage report automation with an Athena querier. Please note that it may take up to 24 hours to receive your first report from AWS after deployment. Additionally, some statistics in the dashboard will only be available once you have two months of billing reports.
+This Terraform module creates the necessary infrastructure for AWS cost and usage report monitoring with grafana.
 
-## Authorize with AWS Configure SSO
-
-Make sure that the account you use is a "management account" in your organization. Otherwise, you may not be able to retrieve account information.
-
-To authorize with AWS Configure SSO, follow these steps:
-
-1. If you haven't already, install the AWS CLI v2. Refer to the [AWS CLI v2 installation guide](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) for instructions.
-
-2. The following command will prompt you to select the AWS SSO profile to use and authenticate with your AWS SSO credentials.:
-
-   > aws configure sso
-
-3. Once authenticated, you can use the AWS CLI with the configured SSO profile to interact with your AWS resources.
-
-For more information on AWS SSO and how to configure it, refer to the [AWS Single Sign-On User Guide](https://docs.aws.amazon.com/singlesignon/latest/userguide/what-is.html).
-
-## Targets
-
-`<environmemt>.tfbackend` file content:
-
-```
-region = "eu-west-1"
-bucket = "example-bucket"
-key = "athena-glue-cur.tfstate"
-```
-
-No newline at end of file!
-
-`<environment>.tfvars` file content:
+## Usage
 
 ```hcl
-environment = "dev"
+module "aws_cur" {
+  source = "git@github.com:sourcehawk/aws-org-billing-dashboard.git//terraform?ref=1.0.0"
+
+  environment   = "dev"
+  create_secret = true
+  secret_name   = "aws-org-billing-dashboard/grafana-athena-datasource"
+}
 ```
 
-## Steps to Run Terraform Code
+## Inputs
 
-_this is just an example, you can run it however you please_
+| Name          | Description                           | Type     | Default                   | Required |
+| ------------- | ------------------------------------- | -------- | ------------------------- | :------: |
+| environment   | Unique identifier for the environment | `string` | n/a                       |   yes    |
+| create_secret | Flag to create a secret               | `bool`   | true                      |    no    |
+| secret_name   | Name of the secret                    | `string` | grafana-athena-datasource |    no    |
 
-1. Clone this repository to your local machine:
+## Outputs
 
-   > git clone git@github.com:sourcehawk/aws-org-billing-dashboard.git
+| Name                         | Description                                                                              |
+| ---------------------------- | ---------------------------------------------------------------------------------------- |
+| athena_access_iam_policy_arn | ARN of the IAM policy that grants access to Athena, workspace and S3                     |
+| accounts                     | A list of AWS account IDs that are included in the cost and usage report                 |
+| secret_id                    | Id of the secret that contains the datasource credentials. Null if create_secret = fales |
 
-2. Change into the Terraform directory:
+## Requirements
 
-   > cd aws-org-billing-dashboard/terraform
+| Name      | Version   |
+| --------- | --------- |
+| terraform | >= 1.6.5  |
+| aws       | >= 2.14.5 |
 
-3. Initialize the Terraform working directory:
+## Providers
 
-   > terraform init -backend-config=targets/dev.tfbackend
+| Name | Version |
+| ---- | ------- |
+| aws  | >= 5.0  |
 
-4. Review the Terraform plan to see what resources will be created:
+## License
 
-   > terraform plan -var-file=targets/dev.tfvars -out=tfplan
-
-5. If everything looks good, apply the Terraform changes:
-
-   > terraform apply tfplan
-
-6. Wait for Terraform to provision the resources. Once completed, you will see the output with the created resources.
-
-7. Destroy
-
-   > terraform destroy -var-file=targets/dev.tfvars
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
