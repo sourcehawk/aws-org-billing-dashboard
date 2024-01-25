@@ -24,4 +24,3 @@ variable "secret_name" {
   description = "(Optional) Name of the AWS Secrets Manager secret to hold the datasource credentials"
   default     = "grafana-athena-datasource"
 }
-
