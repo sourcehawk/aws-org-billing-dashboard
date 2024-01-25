@@ -25,7 +25,7 @@ provider "aws" {
 
 module "aws_cur" {
   source = "./terraform"
-  # source = "git@github.com:sourcehawk/aws-org-billing-dashboard.git//terraform?ref=1.0.0"
+  # source = "github.com/sourcehawk/aws-org-billing-dashboard//terraform?ref=1.1.0"
 
   environment   = var.environment
   create_secret = true

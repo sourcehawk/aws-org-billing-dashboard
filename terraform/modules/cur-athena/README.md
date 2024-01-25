@@ -2,6 +2,8 @@
 
 This Terraform module creates a workgroup for Athena. This allows us to visualize and analyze AWS Cost and Usage Report (CUR) data stored in an AWS Glue Catalog Database by querying with SQL through an athena datasource in grafana.
 
+A second provider should be defined for the created secret uploaded to secrets manager. This is to give more control over where the secrets are since the other resources must be created in the us-east-1 region.
+
 ## Usage
 
 ```hcl
@@ -16,6 +18,7 @@ module "athena_for_grafana" {
 
   providers = {
     aws = aws.us-east-1
+    aws.secrets_provider = aws.eu-west-1
   }
 }
 ```

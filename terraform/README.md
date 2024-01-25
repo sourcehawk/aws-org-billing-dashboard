@@ -11,8 +11,15 @@ module "aws_cur" {
   environment   = "dev"
   create_secret = true
   secret_name   = "aws-org-billing-dashboard/grafana-athena-datasource"
+
+  providers = {
+    aws = aws.us-east-1
+    aws.secrets_provider = aws.eu-west-1
+  }
 }
 ```
+
+A second provider should be defined for the created secret uploaded to secrets manager. This is to give more control over where the secrets are since the other resources must be created in the us-east-1 region.
 
 ## Inputs
 

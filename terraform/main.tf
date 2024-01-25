@@ -14,6 +14,6 @@ module "athena_for_grafana" {
 
   providers = {
     aws                  = aws
-    aws.secrets_provider = aws.secrets_providers
+    aws.secrets_provider = aws.secrets_provider
   }
 }
