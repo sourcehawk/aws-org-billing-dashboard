@@ -4,10 +4,7 @@ kind: Secret
 metadata:
   name: {{ include "common.fullname" . }}-athena-datasource
   labels:
-    {{- include "common.labels" . | nindent 4 }}
-    {{- if .Values.datasource.labels }}
-    {{- toYaml .Values.datasource.labels | nindent 4 }}
-    {{- end }}
+    {{- include "datasource.labels" . | nindent 4 }}
 type: Opaque
 stringData:
   datasource.yaml: |

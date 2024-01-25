@@ -8,7 +8,7 @@ resource "aws_s3_bucket" "queries_athena" {
 
   tags = {
     "GrafanaDataSource" = "true"
-    "Name" = "athena-queries-${var.environment}"
+    "Name"              = "athena-queries-${var.environment}"
   }
 }
 
@@ -148,9 +148,10 @@ resource "aws_iam_access_key" "athena_user_access_key" {
 # ----------------------------------------------
 
 resource "aws_secretsmanager_secret" "athena_user_access_key_secret" {
-  count       = var.create_secret ? 1 : 0
-  name        = var.secret_name
-  description = "Credentials for the Athena Datasource containing billing data from ${var.environment} account"
+  count                   = var.create_secret ? 1 : 0
+  name                    = var.secret_name
+  recovery_window_in_days = 0
+  description             = "Credentials for the Athena Datasource containing billing data from ${var.environment} account"
 }
 
 resource "aws_secretsmanager_secret_version" "athena_user_access_key_secret_version" {
