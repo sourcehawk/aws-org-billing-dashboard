@@ -69,3 +69,15 @@ Datasource labels
 {{- end }}
 {{- end }}
 {{- end }}
+
+{{/*
+Dashboard annotations
+*/}}
+{{- define "dashboard.annotations" -}}
+{{- if .Values.dashboard.annotations }}
+{{ range $key, $value := .Values.dashboard.annotations }}
+{{- $key }}: {{ $value | quote }}
+{{- end }}
+{{- end }}
+{{- end }}
+

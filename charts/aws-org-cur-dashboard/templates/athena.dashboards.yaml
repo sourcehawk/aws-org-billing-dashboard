@@ -5,9 +5,7 @@ metadata:
   labels:
     {{- include "dashboard.labels" . | nindent 4 }}
   annotations:
-    {{- if .Values.dashboard.annotations }}
-    {{- toYaml .Values.dashboard.annotations | nindent 4 }}
-    {{- end }}
+    {{- include "dashboard.annotations" . | nindent 4 }}
 data:
   organization_billing_dashboard.json: |
 {{ .Files.Get "dashboards/organization-billing-dashboard.json" | indent 4 }}
