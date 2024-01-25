@@ -46,3 +46,26 @@ app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
 {{- end }}
 {{- end }}
 
+{{/*
+Dashboard labels
+*/}}
+{{- define "dashboard.labels" -}}
+{{ include "common.labels" . }}
+{{- if .Values.dashboard.labels }}
+{{ range $key, $value := .Values.dashboard.labels }}
+{{- $key }}: {{ $value | quote }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{/*
+Datasource labels
+*/}}
+{{- define "datasource.labels" -}}
+{{ include "common.labels" . }}
+{{- if .Values.datasource.labels }}
+{{ range $key, $value := .Values.datasource.labels }}
+{{- $key }}: {{ $value | quote }}
+{{- end }}
+{{- end }}
+{{- end }}

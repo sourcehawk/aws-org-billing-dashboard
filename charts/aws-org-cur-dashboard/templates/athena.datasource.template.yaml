@@ -5,9 +5,6 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ include "common.fullname" . }}-athena-datasource-template
-  {{- if not (eq .Values.externalSecrets.secretStore.kind "ClusterSecretStore") }}
-  namespace: {{ .Release.Namespace }}
-  {{- end }}
 data:
   datasource.yaml: |
     apiVersion: 1
@@ -25,8 +22,5 @@ data:
           accessKey: "{{ `{{ .accessKey }}` }}" 
           secretKey: "{{ `{{ .secretKey }}` }}" 
   labels: |
-    {{- include "common.labels" . | nindent 4 }}
-    {{- if .Values.datasource.labels }}
-    {{- toYaml .Values.datasource.labels | nindent 4 }}
-    {{- end }}
+    {{- include "datasource.labels" . | nindent 4 }}
 {{- end}}
