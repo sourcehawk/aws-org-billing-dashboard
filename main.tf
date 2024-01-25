@@ -17,6 +17,12 @@ provider "aws" {
   }
 }
 
+# I want to upload the secrets to eu-west-1 and not us-east-1
+provider "aws" {
+  alias  = "secrets_provider"
+  region = "eu-west-1"
+}
+
 module "aws_cur" {
   source = "./terraform"
   # source = "git@github.com:sourcehawk/aws-org-billing-dashboard.git//terraform?ref=1.0.0"
@@ -24,4 +30,9 @@ module "aws_cur" {
   environment   = var.environment
   create_secret = true
   secret_name   = "aws-org-billing-dashboard/grafana-athena-datasource"
+
+  providers = {
+    aws                  = aws
+    aws.secrets_provider = aws.secrets_provider
+  }
 }
