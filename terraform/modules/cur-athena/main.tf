@@ -149,6 +149,7 @@ resource "aws_iam_access_key" "athena_user_access_key" {
 
 resource "aws_secretsmanager_secret" "athena_user_access_key_secret" {
   count                   = var.create_secret ? 1 : 0
+  provider                = aws.secrets_provider
   name                    = var.secret_name
   recovery_window_in_days = 0
   description             = "Credentials for the Athena Datasource containing billing data from ${var.environment} account"
@@ -156,6 +157,7 @@ resource "aws_secretsmanager_secret" "athena_user_access_key_secret" {
 
 resource "aws_secretsmanager_secret_version" "athena_user_access_key_secret_version" {
   count     = var.create_secret ? 1 : 0
+  provider  = aws.secrets_provider
   secret_id = aws_secretsmanager_secret.athena_user_access_key_secret[0].id
   secret_string = jsonencode({
     "access_key_id"     = aws_iam_access_key.athena_user_access_key[0].id
