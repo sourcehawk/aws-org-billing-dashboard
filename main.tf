@@ -27,12 +27,8 @@ module "aws_cur" {
   source = "./terraform"
   # source = "git@github.com:sourcehawk/aws-org-billing-dashboard.git//terraform?ref=1.0.0"
 
-  environment   = var.environment
-  create_secret = true
-  secret_name   = "aws-org-billing-dashboard/grafana-athena-datasource"
-
-  providers = {
-    aws                  = aws
-    aws.secrets_provider = aws.secrets_provider
-  }
+  environment            = var.environment
+  create_secret          = true
+  secret_name            = "aws-org-billing-dashboard/grafana-athena-datasource"
+  secrets_provider_alias = "secrets_provider"
 }

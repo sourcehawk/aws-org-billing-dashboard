@@ -39,9 +39,10 @@ module "aws_cur" {
 
 ## Providers
 
-| Name | Version |
-| ---- | ------- |
-| aws  | >= 5.0  |
+| Name                 | Version |
+| -------------------- | ------- |
+| aws                  | >= 5.0  |
+| aws.secrets_provider | >= 5.0  |
 
 ## License
 
