@@ -33,7 +33,7 @@ To use this project, follow these steps:
 
 1. Clone the repository.
 2. Authorize with the AWS CLI against a "management account" in your organization. (Will not be able to retrieve org data unless management account)
-3. Modify the `example.tfbackend` and `example.tfvars` at the root of the project to conform with your backend and target environment
+3. Modify the `example.tfbackend` and `example.tfvars` in the [targets/] directory to conform with your backend and target environment
 
 - `terraform init -backend-config=targets/example.tfbackend`
 - `terraform plan -var-file=targets/example.tfvars -out=tfplan`
